@@ -14,14 +14,14 @@ module.exports = async function (ctx) {
         // let loginFailCount = dataList[0].loginFailCount;
 
 
-        let exp = 1000*60*5 * 1
+        let exp = 1000*60*5 * 1000
         // 目前只用了accessToken 后续要补上RefreshToken
         let token = ctx.app.jwt.sign({
             auther:"qdds",
             role:"test",
             account,
-            exp:Date.now() + exp,   // 五分钟过期时间
-            iat: Date.now(), // 创建时间
+            uuid:dataList[0].uuid,
+            exp:Date.now() + exp   // 五分钟过期时间
         }, ctx.app.config.jwt.secret);
         const result = await ctx.app.mysql.update('AdminUser',{
             id:dataList[0].id,
@@ -37,7 +37,7 @@ module.exports = async function (ctx) {
             return ctx.body = codeMap('M206');
         }
     }catch(e){
-        let txt = '/cxyChat/login接口异常' + e;
+        let txt = '/admin/login接口异常' + e;
         ctx.body = {msg:txt,code:500};
         console.log(txt)
     }

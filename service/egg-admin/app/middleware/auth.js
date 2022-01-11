@@ -17,10 +17,9 @@ module.exports = (options, app) => {
                 let redisResult = await app.redis.get(token);
                 if(!redisResult) return ctx.body = codeMap("M210")
 
-
                 // token签名校验
                 let expirationTime = app.config.jwt.expirationTime;
-                let {exp,iat,account,auther,role} = tokenInfo;
+                let {exp,account,auther,role} = tokenInfo;
                 if(auther!='qdds') return ctx.body = codeMap("M209");
                 let timeDifference = exp - Date.now();
                 if(timeDifference<=0) throw Error("token过期");

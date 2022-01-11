@@ -6,8 +6,8 @@ class publicApi extends Service {
     // console.log(query)
     return query
   }
-  async selectUserIdByAccount(table,account){
-    let sql = `select id from ${table} where account='${account}'`;
+  async selectUserIdByUuid(table,uuid){
+    let sql = `select id from ${table} where uuid='${uuid}'`;
     return await this.app.mysql.query(this.logQuery(sql));
   }
   async selectAll(table) {
@@ -37,6 +37,11 @@ class publicApi extends Service {
     // valueStr = valueStr.slice(0,-1)
     // let sql = `insert into ${table} (${keyStr}) VALUES ('Wilson', 'Champs-Elysees')`;
     // return await this.app.mysql.query(this.logQuery(sql));
+  }
+  // 查询指定表的列数量
+  async selCountByTable(table){
+    let sql = `select count(*) from ${table}`;
+    return await this.app.mysql.query(this.logQuery(sql));
   }
 }
 

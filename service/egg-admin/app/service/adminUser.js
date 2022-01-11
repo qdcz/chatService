@@ -2,8 +2,8 @@
 const Service = require("egg").Service;
 
 class userInfo extends Service {
-  async selectUserInfoByAccount(account) {
-    let sql = `select * from AdminUserInfo where userId='${account}'`;
+  async selUserInfoByUuid(uuid){
+    let sql = `select address,avatar,introduction,name,phone,registerTime,uuid,sex from AdminUserInfo where uuid='${uuid}'`;
     return await this.app.mysql.query(sql);
   }
 }

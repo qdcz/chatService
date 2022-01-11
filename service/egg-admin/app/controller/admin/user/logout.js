@@ -12,7 +12,7 @@ module.exports = async function (ctx) {
             throw Error("redis校验异常")
         }
     }catch(e){
-        let txt = '/cxyChat/logout 接口异常' + e;
+        let txt = '/admin/logout 接口异常' + e;
         ctx.body = {msg:txt,code:500};
         console.log(txt)
     }
