@@ -7,9 +7,6 @@ module.exports = async function (ctx) {
         let token = ctx.headers['y-authentication'];
         let tokenInfo = ctx.app.jwt.verify(token,ctx.app.config.jwt.secret);
         let {uuid} = tokenInfo;
-        // let ids = await ctx.service.public.selectUserIdByAccount("AdminUser",account);
-        // if(ids.length<=0) return ctx.body = codeMap('M207');
-        // let id = ids[0].id;
 
         if(ctx.request.method == 'POST'){  // 查信息
             let result = await ctx.service.adminUser.selUserInfoByUuid(uuid);

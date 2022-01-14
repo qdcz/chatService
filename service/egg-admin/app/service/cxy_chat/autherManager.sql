@@ -34,11 +34,11 @@ CREATE TABLE AdminUserRole (
 CREATE TABLE AdminUserRouter (
     id bigint(0) NOT NULL AUTO_INCREMENT COMMENT '路由id 主键',
     uuid varchar(255) NOT NULL COMMENT '业务id',
-    name varchar(50) COMMENT '路由名字',
-    rootid varchar(50) COMMENT '根级id',
-    parentid varchar(50) COMMENT '父级id',
+    routerName varchar(50) COMMENT '路由名字',
+    rootId varchar(50) COMMENT '根级id',
+    parentId varchar(50) COMMENT '父级id',
     icon varchar(50) COMMENT '路由图标',
-    routerFnid varchar(255) COMMENT '功能id',
+    routerFnId varchar(255) COMMENT '功能id',
     PRIMARY KEY (id)
 ) COMMENT='用户路由表';
 

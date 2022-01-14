@@ -10,7 +10,7 @@ module.exports = async function (ctx) {
         if(updRoleInfoResult.affectedRows==1){
             ctx.body = codeMap('M200')
         }else{
-            throw Error("修改角色信息失败")
+            throw Error("修改角色信息失败/该角色id无效")
         }
     }catch(e){
         let txt = '/admin/role 接口异常' + e;

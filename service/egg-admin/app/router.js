@@ -21,4 +21,11 @@ module.exports = app => {
   router.post('/admin/role', controller.admin.role.index.addRole);  // 后台管理模板-添加角色信息
   router.put('/admin/role', controller.admin.role.index.updRole);  // 后台管理模板-修改角色信息
   router.delete('/admin/role', controller.admin.role.index.delRole);  // 后台管理模板-删除角色
+
+
+  router.post('/admin/router', controller.admin.router.index.addRouter);  // 后台管理模板-添加路由信息
+  router.post('/admin/routerList', controller.admin.router.index.selRouterList);  // 后台管理模板-获取路由列表
+  router.put('/admin/router', controller.admin.router.index.updRouter);  // 后台管理模板-修改路由信息
+  router.delete('/admin/router', controller.admin.router.index.delRouter);  // 后台管理模板-删除路由
+
 };
