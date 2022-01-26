@@ -44,10 +44,10 @@ export const c = (data) => {
 }
 
 // 用户列表
-export const api_getUserList = (data) => {
+export const api_UserList = (data) => {
   const R = Object.assign({}, data)
   return request({
-    url: '/admin/userInfo',
+    url: '/admin/userList',
     method: 'post',
     data:R,
     headers:{'Content-Type': 'application/json;charset=utf-8'},

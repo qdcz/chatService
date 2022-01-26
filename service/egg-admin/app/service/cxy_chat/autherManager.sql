@@ -49,6 +49,8 @@ CREATE TABLE AdminUserRouterFunction (
     PRIMARY KEY (id)
 ) COMMENT='用户路由下功能表';
 
+set global log_bin_trust_function_creators=TRUE;
+
 CREATE FUNCTION `AdminUserRouter_GetChildNodesRecursion`(rootId varchar(100))
 RETURNS varchar(2000)  
 BEGIN   

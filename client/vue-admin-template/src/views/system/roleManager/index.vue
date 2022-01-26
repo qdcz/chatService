@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-button type="primary" @click="handleAddRole">添加角色</el-button>
 
-    <el-table :data="rolesList" style="width: 100%;margin-top:30px;" border>
+    <el-table :data="rolesList" style="width: 100%;margin-top:6px;" border>
       <el-table-column align="center" label="uuid" width="200">
         <template slot-scope="scope">
           {{ scope.row.uuid }}
@@ -20,7 +20,7 @@
       </el-table-column>
       <el-table-column align="center" label="关联路由">
         <template slot-scope="scope">
-          {{ scope.row.routerId }}
+          {{  showRelationRouter(scope.row.routerId) }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="配置" width="180">
@@ -41,8 +41,8 @@
           <el-input v-model="role_formData.roleMark" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea"
             placeholder="请输入角色描述" />
         </el-form-item>
-        <el-form-item label="权限分配" prop="routesData">
-          <el-tree ref="roleTree" :data="tree_data" :props="defaultProps" show-checkbox node-key="id"
+        <el-form-item label="权限分配">
+          <el-tree ref="roleTree" :data="tree_data" show-checkbox node-key="id"
             class="permission-tree" :accordion="true" :check-strictly='tree_checkStrictly'>
             <span class="custom-tree-node" slot-scope="{ node, data }">
               <div class="padd10">
@@ -57,11 +57,21 @@
         <el-button type="primary" @click="confirmRole">确定</el-button>
       </div>
     </el-dialog>
+
+
+    <!-- 分页器 -->
+    <el-pagination 
+      style="margin-top:10px;margin-left:-10px;" 
+      background layout="sizes, total ,prev, pager, next" :total="pageTotal"
+      @size-change="pagination_sizeChange"
+      @current-change="pagination_currentChange"
+      @prev-click="pagination_prevNextClick"
+      @next-click="pagination_prevNextClick"
+    ></el-pagination>
   </div>
 </template>
 
 <script>
-  import path from 'path'
   import {
     Loading
   } from 'element-ui';
@@ -73,26 +83,20 @@
     api_roleAdd,
     api_roleUpd,
     api_roleDel
-  } from '@/api/adminRole.js'
-
-  const defaultRole = {
-    key: '',
-    name: '',
-    description: '',
-    routes: []
-  }
-  let loadingInstance = "加载中...";
+  } from '@/api/adminRole.js';
+  
+  c
   export default {
     data() {
       return {
         tree_data: [], // 树级结构数据
+        routerList:[], // 路由表数据
         tree_checkStrictly: false, // 路由表树的check是否严格的遵循父子不互相关联的做法
-
-
-        pageNumber: 1, // 分页下标
-        pageSize: 10, // 分页大小
+        pageNumber: 1, // 分页下标(角色信息)
+        pageSize: 10, // 分页大小(角色信息)
+        pageTotal:0,  // 总数大小(角色信息)
         dialogType: 'new',   // dialog类型  new/edit
-        role_formData:{
+        role_formData:{  // dialog表单数据
           roleName:"",
           roleMark:""
         },
@@ -108,25 +112,26 @@
             trigger: 'change'
           }]
         },
-
-
-        // role: Object.assign({}, defaultRole), // 添加角色的表单
-
-
-        routes: [], // 路由表数据
-        rolesList: [], // 表格的角色列表
-        dialogVisible: false, // 编辑/添加的弹窗
-
-        defaultProps: {
-          children: 'children',
-          label: 'name',
-          title: 'mate'
-        }
+        rolesList: [], // 角色信息列表
+        dialogVisible: false // 编辑/添加的弹窗
       }
     },
     computed: {
-      routesData() {
-        return this.routes
+      // 关联路由的id 将id转为对应的文字
+      showRelationRouter(){
+        return function(id){
+          if(!id) return '-'
+          let list = (id.toString()).split(",");
+          let str = '';
+          list.forEach(i=>{
+            this.routerList.forEach(ii=>{
+              if(i==ii.uuid){
+                str += ii.routerName + "、"
+              }
+            })
+          })
+          return str.slice(0,-1)
+        }
       }
     },
     created() {
@@ -134,31 +139,15 @@
       this.getRoleList(this.pageSize, this.pageNumber)
     },
     methods: {
-      // 查询所有的路由信息
-      async onSelRouter() {
-        loadingInstance = Loading.service({
-          fullscreen: true
-        })
-        let {
-          code,
-          data,
-          msg
-        } = await SelRouter()
-        if (code !== 200) return this.$message.error(msg)
-        this.routes = data
-        loadingInstance.close()
-      },
-
-      // 添加角色
+      // 添加角色信息
       handleAddRole() {
-        this.role = Object.assign({}, defaultRole)
         if (this.$refs.tree) {
           this.$refs.tree.setCheckedNodes([])
         }
         this.dialogType = 'new'
         this.dialogVisible = true
       },
-      // 表格编辑按钮
+      // 编辑按钮
       async handleEdit(scope) {
         this.dialogType = 'edit'
         this.dialogVisible = true
@@ -166,11 +155,7 @@
         this.role_formData.uuid = scope.row.uuid;
         this.role_formData.roleName = scope.row.roleName;
         this.role_formData.roleMark = scope.row.roleMark;
-        this.$nextTick(() => {
-          if(scope.row.routerId){
-            this.$refs.roleTree.setCheckedKeys(scope.row.routerId.split(","))
-          }
-        })
+        this.$nextTick(() => scope.row.routerId ? this.$refs.roleTree.setCheckedKeys(scope.row.routerId.split(",")) :"")
       },
       // 删除按钮
       handleDelete({
@@ -194,25 +179,6 @@
               this.updRole(Object.assign(this.role_formData,{
                 routerId:this.changeDataFormatForService()  // 包含了根级的目录和子级的目录
               }))
-              // let {
-              //   code,
-              //   msg
-              // } = await UpdRole({
-              //   _id: this.role.key,
-              //   RoleName: this.role.name,
-              //   RoleDescript: this.role.description,
-              //   RouterList: this.$refs.tree.getCheckedNodes() // 注意这边存的是选中的节点 要和节点树区别开来，就是取出来的时候要数据处理成节点树
-              // })
-
-
-              // if (code !== 200) return this.$message.error(msg)
-              // this.$message({
-              //   message: msg,
-              //   type: 'success'
-              // });
-              // this.getRoleList()
-              // this.dialogVisible = false
-              // this.tree_checkStrictly = true
             } else {
               this.addRole(Object.assign(this.role_formData,{
                 routerId:this.changeDataFormatForService()  // 包含了根级的目录和子级的目录
@@ -232,12 +198,26 @@
         }
         this.$refs.roleTree.setCheckedKeys([]);
       },
+      // 页数大小改变
+      pagination_sizeChange(e){
+        this.pageSize = e
+        this.getRoleList(this.pageSize,this.pageNumber)
+      },
+      pagination_currentChange(e){
+        this.pageNumber = e
+        this.getRoleList(this.pageSize,this.pageNumber)
+      },
+      pagination_prevNextClick(e){
+        this.pageNumber = e
+        this.getRoleList(this.pageSize,this.pageNumber)
+      },
+      /*===================================================工具函数===============================================*/
       /**
        * 将后端给出的格式转化为前端树组件需要的数据格式
        * @param {Object} data 需要处理的源数据
        */
       changeDataFormatForTree(data) {
-        console.time("复用迭代法1")
+        data = JSON.parse(JSON.stringify(data))
         let delUuids = [];
         let delIndexs = [];
         let multiplexing = function(data) {
@@ -273,22 +253,7 @@
         }
         data = multiplexing(data)
         delIndexs.forEach((i, j) => j == 0 ? data.splice(i, 1) : data.splice(i - j, 1))
-        console.timeEnd("复用迭代法1")
         return data
-
-
-
-        let rootMenus = data.filter(menuItem => !menuItem.parentId);
-        let recursion = (list) => {
-          list.forEach(menuItem => {
-            menuItem.children = data.filter(i => i.parentId == menuItem.uuid)
-            recursion(menuItem.children)
-          })
-        }
-        console.time("递归法2")
-        recursion(rootMenus)
-        console.timeEnd("递归法2")
-        return rootMenus
       },
       /**
        * 将前端树组件给出的格式转化为后端需要的数据格式("id1,id2,id3")
@@ -300,7 +265,7 @@
           let res = "";
           data.forEach(i=>{
             if(i.children && i.children.length>0){
-              res += recursion(i.children,i.uuid,level+1)
+              recursion(i.children,i.uuid,level+1)
             }else{
               res += str + i.uuid + ","
             }
@@ -309,27 +274,24 @@
         }
         return (recursion(da)).slice(0,-1);
       },
-      /*=====================接口相关================================*/
+      /*===================================================接口相关===============================================*/
       /**
        * 查询路由信息列表
-       * @param {Object} pageSize
-       * @param {Object} pageNumber
        */
-      async getRouterList(pageSize, pageNumber) {
+      async getRouterList() {
         loadingInstance = Loading.service({
           fullscreen: true
         })
         try {
           let {
-            code,
-            data,
-            msg
+            data
           } = await api_routerList({
             pageSize: 10000,
             pageNumber: 1
           })
           this.$message.success("路由列表查询成功!")
           this.tree_data = this.changeDataFormatForTree(data)
+          this.routerList = data;
           return data
         } catch (e) {
 
@@ -392,12 +354,13 @@
           let {
             code,
             data,
-            msg
+            total
           } = await api_roleList({
             pageSize,
             pageNumber
           })
           this.rolesList = data
+          this.pageTotal = total
           this.$message.success("角色信息查询成功!")
         } catch (e) {
 

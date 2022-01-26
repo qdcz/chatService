@@ -1,0 +1,52 @@
+// 旋转类
+@i: 360;
+.rota(@i) when (@i>0) {
+  .rota((@i - 5));
+
+  @a: (@i) * 1;
+  
+  // margin
+  .rota-@{a} {
+    transform: rotate(1deg * @i);
+  }
+  
+}
+
+.rota(@i);
+
+
+// 过渡动画
+.trans-Z-3 {
+  transition: all 0.3s;
+}
+
+.trans-Z-5 {
+  transition: all 0.5s;
+}
+
+.trans-Z-8 {
+  transition: all 0.8s;
+}
+
+.trans-1 {
+  transition: all 1s;
+}
+.trans-3{
+  transition: all 3s;
+}
+
+
+
+// 动画
+.animation-rotate {
+  animation: rotate .8s infinite normal;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

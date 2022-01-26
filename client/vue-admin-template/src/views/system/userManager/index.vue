@@ -49,11 +49,11 @@
     <!-- 分页器 -->
     <div class=" mt20">
       <el-pagination
-        :current-page="QuerySelect.pageNum + 1"
+        :current-page="QuerySelect.pageNumber"
         :page-sizes="[10, 20, 50, 100]"
         :page-size="QuerySelect.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
+        :total="QuerySelect.pageTota"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -63,9 +63,18 @@
 
 <script>
 // import { GetUserList } from '../../../api/user.js'
-import tables from './comonents/Tables.vue'
-import addDialog from './comonents/dialogs.vue'
-import CitySelect from '@/components/CitySelect/CitySelect'
+import {
+  Loading
+} from 'element-ui';
+import tables from './comonents/Tables.vue';
+import addDialog from './comonents/dialogs.vue';
+import CitySelect from '@/components/CitySelect/CitySelect';
+import {
+  api_UserList
+} from '@/api/adminUser.js';
+
+
+let loadingInstance = "加载中...";
 export default {
   name: 'Tables',
   components: { tables, addDialog, CitySelect },
@@ -73,8 +82,9 @@ export default {
     return {
       QuerySelect: {
         // 条件查询参数
-        pageNum: 0,
-        pageSize: 10,
+        pageNumber: 1, // 分页下标(用户信息)
+        pageSize: 10, // 分页大小(用户信息)
+        pageTota:0,   // 总数大小(用户信息)
         Nickname: '',
         account: '',
         sex: '',
@@ -91,7 +101,7 @@ export default {
       },
 
       listLoading: false,
-      DataList: [], // 表格数据
+      userList: [], // 表格数据
       isshowDialogs: false, // 是否显示发布弹窗
       DialogInfo: '', // 表格内查看编辑带给dialog的数据
       total: 0 // 分页器总数
@@ -99,6 +109,7 @@ export default {
   },
   created() {
     // this.getLists()
+    this.getUserList(this.QuerySelect.pageSize,this.QuerySelect.pageNumber);
   },
   methods: {
     onAddUser() {
@@ -170,6 +181,30 @@ export default {
         console.log(e)
       } finally {
         this.listLoading = false
+      }
+    },
+    /*===================================================接口相关===============================================*/
+    // 查询用户信息列表
+    async getUserList(pageSize, pageNumber) {
+      loadingInstance = Loading.service({
+        fullscreen: true
+      })
+      try {
+        let {
+          code,
+          data,
+          total
+        } = await api_UserList({
+          pageSize,
+          pageNumber
+        })
+        this.userList = data
+        this.pageTotal = total
+        this.$message.success("用户列表查询成功!")
+      } catch (e) {
+
+      } finally {
+        loadingInstance.close()
       }
     }
   }

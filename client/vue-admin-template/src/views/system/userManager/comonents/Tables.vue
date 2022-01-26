@@ -6,9 +6,9 @@
           <span>{{ scope.row.i }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="100" align="center" label="昵称" show-overflow-tooltip sortable prop="Version">
+      <el-table-column width="100" align="center" label="昵称" show-overflow-tooltip sortable prop="name">
         <template slot-scope="scope">
-          <span>{{ scope.row.Nickname || '暂未设置' }}</span>
+          <span>{{ scope.row.name || '暂未设置' }}</span>
         </template>
       </el-table-column>
       <el-table-column width="140" align="center" label="账号" show-overflow-tooltip sortable prop="Os">

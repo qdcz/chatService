@@ -1,0 +1,52 @@
+.swiper-container {
+  width: 100%;
+  //height: calc(100vh - 55px - 50px);
+  //overflow: scroll !important;
+}
+
+.swiper-slide {
+  height: calc(100vh - 55px - 50px) !important;
+  overflow: scroll !important;
+}
+
+//粘性布局吸顶
+.stickyTop0{
+  position: sticky;
+  top: 0;
+  width: 100%;
+}
+
+//导航栏
+.nav {
+  height: 55px;
+  background: #55aaff;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .nav-left {
+    display: flex;
+    height: 45px;
+    line-height: 45px;
+
+    .nav-btn {
+      padding: 0 10px;
+      color: #fff;
+      font-size: 16px;
+      transition: all .1s;
+    }
+    // 按钮选中效果
+    .Selected {
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+
+  .iconfont {
+    padding: 10px;
+    color: #fff;
+    font-size: 20px;
+  }
+
+}
