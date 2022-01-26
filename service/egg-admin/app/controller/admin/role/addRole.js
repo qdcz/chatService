@@ -6,7 +6,6 @@ module.exports = async function (ctx) {
     try{
         const {roleName,roleMark,routerId} = ctx.request.body;
         if(!(roleName && roleMark)) return ctx.body = codeMap('M201');
-
         const selRoleResult = await ctx.service.adminRole.selRoleNameIsRepeace(roleName)
         let count = selRoleResult[0]["count(*)"];
         if(count>=1) return ctx.body = codeMap("M211")
@@ -14,7 +13,8 @@ module.exports = async function (ctx) {
             `
                 '${uuidV4()}',
                 '${roleName}',
-                '${roleMark}'
+                '${roleMark}',
+                '${routerId}'
             `
         );
         if(addResult.affectedRows==1){

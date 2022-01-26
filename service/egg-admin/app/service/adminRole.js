@@ -9,12 +9,17 @@ class role extends Service {
   }
     // 添加角色
   async addRole(valueStr){
-    let sql = `insert into AdminUserRole (uuid,roleName,roleMark) values (${valueStr})`;
+    let sql = `insert into AdminUserRole (uuid,roleName,roleMark,routerId) values (${valueStr})`;
     return await this.app.mysql.query(sql);
   }
-    // 查询角色名字是否重复
+    // 查询角色名字是否重复(数量)
   async selRoleNameIsRepeace(roleName){
     let sql = `SELECT count(*) FROM AdminUserRole where roleName='${roleName}'`;
+    return await this.app.mysql.query(sql);
+  }
+    // 根据uuid查询角色信息
+  async selRoleInfoByUuid(uuid){
+    let sql = `SELECT * FROM AdminUserRole where uuid='${uuid}'`;
     return await this.app.mysql.query(sql);
   }
     // 根据uuid更新角色信息

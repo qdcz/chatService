@@ -26,7 +26,7 @@ CREATE TABLE AdminUserRole (
     id bigint(0) NOT NULL AUTO_INCREMENT COMMENT '角色id 主键',
     uuid varchar(255) NOT NULL COMMENT '业务id',
     roleName varchar(50) COMMENT '角色名字',
-    routerId varchar(255) COMMENT '路由id',
+    routerId longtext(0) COMMENT '路由id',
     roleMark varchar(255) COMMENT '角色描述',
     PRIMARY KEY (id)
 ) COMMENT='用户角色表';

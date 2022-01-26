@@ -5,11 +5,8 @@ module.exports = async function (ctx) {
     try{
         const {uuid} = ctx.request.body;
         if(!(uuid)) return ctx.body = codeMap('M201');
-
-        const selRouterResult = await ctx.service.adminRouter.delRouterByUuid(uuid)
-        console.log(selRouterResult)
-
-        if(selRouterResult.affectedRows==1){
+        const delRouterResult = await ctx.service.adminRouter.delRouterByUuid(uuid)
+        if(delRouterResult){
             ctx.body = codeMap('M200')
         }else{
             throw Error("删除路由信息失败/路由id无效！")
