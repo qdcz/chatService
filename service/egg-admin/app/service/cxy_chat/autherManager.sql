@@ -48,3 +48,17 @@ CREATE TABLE AdminUserRouterFunction (
     name varchar(50) COMMENT '功能名字',
     PRIMARY KEY (id)
 ) COMMENT='用户路由下功能表';
+
+CREATE FUNCTION `AdminUserRouter_GetChildNodesRecursion`(rootId varchar(100))
+RETURNS varchar(2000)  
+BEGIN   
+DECLARE str varchar(2000);  
+DECLARE cid varchar(100);   
+SET str = '$';   
+SET cid = rootId;   
+WHILE cid is not null DO   
+    SET str = concat(str, ',', cid);   
+    SELECT group_concat(uuid) INTO cid FROM AdminUserRouter where FIND_IN_SET(parentId,cid);   
+END WHILE;   
+RETURN str;   
+END
