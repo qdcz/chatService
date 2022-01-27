@@ -39,11 +39,11 @@
     </div>
 
     <!-- 添加编辑的dialog -->
-    <add-dialog :isshow-dialogs.sync="isshowDialogs" :dialog-info.sync="DialogInfo" @updateList="getLists" />
+    <add-dialog :isshow-dialogs.sync="isshowDialogs" :dialog-info.sync="DialogInfo" @updateList="getUserList" />
 
     <el-button type="primary" icon="el-icon-plus" @click="isshowDialogs=true">添加新用户</el-button>
     <!-- 表格内容 -->
-    <tables class="mt20" :list="DataList" :list-loading.sync="listLoading" :isshow-dialogs.sync="isshowDialogs" :dialog-info.sync="DialogInfo" @updateList="getLists" />
+    <tables class="mt20" :list="DataList" :list-loading.sync="listLoading" :isshow-dialogs.sync="isshowDialogs" :dialog-info.sync="DialogInfo" @updateList="getUserList" />
 
 
     <!-- 分页器 -->
@@ -53,7 +53,7 @@
         :page-sizes="[10, 20, 50, 100]"
         :page-size="QuerySelect.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="QuerySelect.pageTota"
+        :total="QuerySelect.pageTotal"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -72,6 +72,9 @@ import CitySelect from '@/components/CitySelect/CitySelect';
 import {
   api_UserList
 } from '@/api/adminUser.js';
+import {
+  api_roleList
+} from '@/api/adminRole.js';
 
 
 let loadingInstance = "加载中...";
@@ -84,7 +87,7 @@ export default {
         // 条件查询参数
         pageNumber: 1, // 分页下标(用户信息)
         pageSize: 10, // 分页大小(用户信息)
-        pageTota:0,   // 总数大小(用户信息)
+        pageTotal:0,   // 总数大小(用户信息)
         Nickname: '',
         account: '',
         sex: '',
@@ -101,15 +104,16 @@ export default {
       },
 
       listLoading: false,
-      userList: [], // 表格数据
+      userList: [], // 用户列表数据
+      roleList:[],  // 角色列表
       isshowDialogs: false, // 是否显示发布弹窗
       DialogInfo: '', // 表格内查看编辑带给dialog的数据
       total: 0 // 分页器总数
     }
   },
   created() {
-    // this.getLists()
     this.getUserList(this.QuerySelect.pageSize,this.QuerySelect.pageNumber);
+    this.getRoleList(10000,1);
   },
   methods: {
     onAddUser() {
@@ -127,20 +131,20 @@ export default {
       // console.log(new Date(`${this.QuerySelect['registerTimeBeginTime'].getTime()}`))
       // json['registerTimeBeginTime'] = this.QuerySelect['registerTimeBeginTime'].getTime() || ''
       // json['registerTimeEndTime'] = this.QuerySelect['registerTimeEndTime'].getTime() || ''
-      this.getLists(json)
+      this.getUserList(json)
     },
     // 分页器 条数发生变化
     handleSizeChange(val) {
       this.QuerySelect.pageSize = val
       this.QuerySelect.pageNum = 0
       const json = JSON.parse(JSON.stringify(this.QuerySelect))
-      this.getLists(json)
+      this.getUserList(json)
     },
     // 分页器 页数发生变化
     handleCurrentChange(val) {
       this.QuerySelect.pageNum = val - 1
       const json = JSON.parse(JSON.stringify(this.QuerySelect))
-      this.getLists(json)
+      this.getUserList(json)
     },
     onReset() {
       this.QuerySelect = {
@@ -161,7 +165,7 @@ export default {
         areaId:""
       }
     },
-    async getLists(json) {
+    async getUserList(json) {
       json = json || { pageNum: this.QuerySelect.pageNum, pageSize: this.QuerySelect.pageSize }
       try {
         this.listLoading = true
@@ -201,6 +205,27 @@ export default {
         this.userList = data
         this.pageTotal = total
         this.$message.success("用户列表查询成功!")
+      } catch (e) {
+
+      } finally {
+        loadingInstance.close()
+      }
+    },
+    // 查询角色信息列表
+    async getRoleList(pageSize, pageNumber) {
+      loadingInstance = Loading.service({
+        fullscreen: true
+      })
+      try {
+        let {
+          code,
+          data,
+        } = await api_roleList({
+          pageSize,
+          pageNumber
+        })
+        this.roleList = data
+        this.$message.success("角色列表查询成功!")
       } catch (e) {
 
       } finally {

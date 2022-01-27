@@ -52,7 +52,6 @@
 </template>
 
 <script>
-  // const OSS = require('ali-oss')
   // import { Register,UpdUser } from '../../../../api/user.js'
   // import {GetRoleInfo} from '../../../../api/YangPan/role.js'
 
@@ -129,8 +128,7 @@
       }
     },
     async mounted() {
-      this.GetRoleList()
-      this.GetOssSts()
+      // this.GetRoleList()
     },
     methods: {
       // 是否显示密码
@@ -336,16 +334,6 @@
         }
       },
       /** *****************************************************************  OSS处理部分****************************************************/
-      // 初始化oss
-      async GetOssSts() {
-        this.ali_oss = new OSS({
-          region: 'oss-cn-hangzhou',
-          accessKeyId: this.STS.credentials.AccessKeyId,
-          accessKeySecret: this.STS.credentials.AccessKeySecret,
-          stsToken: this.STS.credentials.SecurityToken,
-          bucket: 'qdds666'
-        })
-      },
       // 删除oss文件
       async DelOssFile(dir) {
         try {
