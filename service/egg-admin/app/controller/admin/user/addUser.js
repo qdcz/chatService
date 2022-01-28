@@ -5,7 +5,7 @@ const uuidV4 = require("uuid-v4")
 // 添加用户信息
 module.exports = async function (ctx) {
     try{
-        const {account,password,name,sex,phone,address,introduction,registerTime,avatar} = ctx.request.body;
+        const {account,password,name,sex,phone,address,introduction,avatar,roleId} = ctx.request.body;
         if(!(account && password)) return ctx.body = codeMap('M201');
         const dataList = await ctx.service.public.selectTableBySingleField("AdminUser","account",account);
         if(dataList.length!=0) return ctx.body = codeMap('M202');
@@ -14,7 +14,7 @@ module.exports = async function (ctx) {
         try {
             let uuid = uuidV4()
             console.log(uuid)
-            await conn.insert("AdminUser", { uuid:`${uuid}`,account,password });
+            await conn.insert("AdminUser", { uuid:`${uuid}`,account,password,roleId });
             await conn.insert("AdminUserInfo", {
                 uuid:`${uuid}`,
                 registerTime:ctx.app.mysql.literals.now,

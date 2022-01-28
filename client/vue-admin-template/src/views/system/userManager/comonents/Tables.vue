@@ -117,8 +117,12 @@
       formatDate(row, column) {
         const data = row[column.property]
         const dt = new Date(data)
-        return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt
-          .getMinutes() + ':' + dt.getSeconds()
+        return dt.getFullYear() 
+          + '-' + (dt.getMonth() + 1 >10 ? dt.getMonth() + 1 :"0"+ (dt.getMonth() + 1))
+          + '-' + (dt.getDate() >=10 ? dt.getDate() :"0"+ dt.getDate())
+          + ' ' + (dt.getHours() >=10 ? dt.getHours() :"0"+ dt.getHours())
+          + ':' + (dt.getMinutes() >=10 ? dt.getMinutes() :"0"+ dt.getMinutes())
+          + ':' + (dt.getSeconds() >=10 ? dt.getSeconds() :"0"+ dt.getSeconds())
       },
 
       /*===================================================接口相关===============================================*/

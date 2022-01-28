@@ -1,28 +1,35 @@
 <template>
-  <div class="dialogs">
-    <el-dialog title="修改个人信息" :visible.sync="isShowDialog" width="60%" center @close="dialogClose">
+  <div class="">
+    <el-dialog
+      customClass='cust_dialog'
+      :title="dialogInfo ? '更新用户信息' : '添加用户信息'"
+      :visible.sync="isShowDialog" width="60%"
+      center @close="dialogClose"
+    >
       <el-form ref="form" :model="form" class="el-form" :rules="rules" label-width="80px" label-position="left">
         <el-form-item label="账号" prop="account">
-          <el-input v-model="form.account" size="large" :disabled="dialogInfo._id?true:null" />
+          <el-input v-model="form.account" size="large" :disabled="dialogInfo?true:null" />
         </el-form-item>
-        <el-form-item label="密码" prop="pwd">
+        <el-form-item label="密码" prop="password">
           <div class="flex ali-cen hei-inh">
-            <el-input v-model="form.pwd" size="large" :type="IsShowPwd" placeholder="请输入密码" />
-            <el-button class="ml20  hei-inh" type="" icon="el-icon-thumb" @click='showHidePwd'>{{IsShowPwdTxt}}</el-button>
+            <el-input v-model="form.password" size="large" :type="IsShowPwd" placeholder="请输入密码" />
+            <el-button class="ml20  hei-inh" type="" icon="el-icon-thumb" @click='showHidePwd'>{{IsShowPwdTxt}}
+            </el-button>
           </div>
         </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-select v-model="form.role" placeholder="选择角色" style="padding: 0;" clearable>
-            <el-option :label="i.RoleName" :value="i.RoleName"  v-for="i in RoleList" :key='i._id'/>
+        <el-form-item label="角色" prop="roleId">
+          <el-select v-model="form.roleId" placeholder="选择角色" style="padding: 0;" clearable>
+            <el-option :label="i.roleName" :value="i.uuid" v-for="i in RoleList" :key='i.uuid' />
           </el-select>
         </el-form-item>
-        <el-form-item label="昵称" prop="Nickname">
-          <el-input v-model="form.Nickname" size="large" placeholder="请输入昵称" />
+        <el-form-item label="昵称" prop="name">
+          <el-input v-model="form.name" size="large" placeholder="请输入昵称" />
         </el-form-item>
         <el-form-item label="头像" prop="avatar">
           <el-upload ref="upload" action="" class="avatar-uploader" list-type="picture-card" :auto-upload="false"
             :limit="1" :file-list="fileList" :before-upload="beforeImgUpload" :on-exceed="cover_handleExceed"
-            :on-success="ImgUploadSuccess" :before-remove="BeforeRemoveImgUpload" :on-preview="ImgPreview" :on-change="singleFileChange">
+            :on-success="ImgUploadSuccess" :before-remove="BeforeRemoveImgUpload" :on-preview="ImgPreview"
+            :on-change="singleFileChange">
             <!-- <img  :src="fileList[0].url" class="avatar"> -->
             <i class="el-icon-plus avatar-uploader-icon" />
           </el-upload>
@@ -37,43 +44,45 @@
           </el-col>
         </el-form-item>
         <el-form-item label="简介" prop="introduce">
-          <el-input v-model="form.introduce" size="large" placeholder="简介" type="textarea" :autosize="{ minRows: 2, maxRows: 8 }" />
+          <el-input v-model="form.introduce" size="large" placeholder="简介" type="textarea"
+            :autosize="{ minRows: 2, maxRows: 8 }" />
         </el-form-item>
         <el-form-item label="性别" prop="sex">
-          <el-select v-model="form.sex" placeholder="选择性别"  style="padding: 0;">
+          <el-select v-model="form.sex" placeholder="选择性别" style="padding: 0;">
             <el-option label="男" value="男" />
             <el-option label="女" value="女" />
           </el-select>
         </el-form-item>
-        <el-button class="submit-bth" type="primary" @click="onSubmit('form')">{{ dialogInfo._id ? '更新' : '发布' }}</el-button>
+        <el-button class="submit-bth" type="primary" @click="onSubmit('form')">{{ dialogInfo ? '更新' : '发布' }}
+        </el-button>
       </el-form>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  // import { Register,UpdUser } from '../../../../api/user.js'
-  // import {GetRoleInfo} from '../../../../api/YangPan/role.js'
-
-  // import {API$DelOssFile} from '../../../../api/YangPan/OSS.js'
-  // import { mapGetters } from 'vuex'
+  import {
+    Loading
+  } from 'element-ui';
+  import {
+    api_addUser
+  } from '@/api/adminUser.js';
+  let loadingInstance = "加载中...";
   export default {
-    props: ['isShowDialog', 'dialogInfo'],
+    props: ['isShowDialog', 'dialogInfo', 'RoleList'],
     data() {
       // 自定义密码校验规则
       var validatePwd = (rule, value, callback) => {
         if (!value) {
           callback(new Error('密码不能为空'));
-        } else if(!(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/.test(value))) {
+        } else if (!(/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/.test(value))) {
           callback(new Error('密码不符合格式'));
-        }else{
+        } else {
           callback();
         }
       };
       return {
-        ali_oss: '',              // 阿里oss实例化对象
-        RoleList:[],              // 角色列表
-
+        ali_oss: '', // 阿里oss实例化对象
         licenseImageUrl: [],
         fileList: [],
         ImgDialog: {
@@ -82,58 +91,67 @@
         },
         form: {
           account: '',
-          Nickname: '',
-          role:"",
-          birth: '',
-          introduce: '',
-          pwd: '',
-          sex: ''
+          password: '',
+          name: '',
+          sex: "",
+          phone: '',
+          address: '',
+          introduction: '',
+          avatar: ''
         },
         rules: {
-          account: [{ required: true, message: '账号不能为空', trigger: 'change' }],
-          pwd: [{ required: true, message: '密码不能为空', trigger: 'change' }],
-          role: [{ required: true, message: '角色不能为空', trigger: 'change' }]
+          account: [{
+            required: true,
+            message: '账号不能为空',
+            trigger: 'change'
+          }],
+          password: [{
+            required: true,
+            message: '密码不能为空',
+            trigger: 'change'
+          }]
         },
-
-        hidePwd:true // 是否隐藏密码
+        hidePwd: true // 是否隐藏密码
       }
     },
     watch: {
       dialogInfo() {
         console.log('触发监听')
+        // this.form = JSON.parse(JSON.stringify(this.dialogInfo))
+        
         this.form.account = this.dialogInfo.account
-        this.form.Nickname = this.dialogInfo.Nickname
-        this.form.role = this.dialogInfo.role
-        this.form.birth = this.dialogInfo.birth
-        this.form.introduce = this.dialogInfo.introduce
+        this.form.password = this.dialogInfo.password
+        this.form.name = this.dialogInfo.name
+        this.form.roleId = this.dialogInfo.roleId
+        this.form.address = this.dialogInfo.address
+        this.form.introduction = this.dialogInfo.introduction
         this.form.sex = this.dialogInfo.sex
-        this.form.pwd = this.dialogInfo.pwd
+        this.form.phone = this.dialogInfo.phone
+        this.form.uuid = this.dialogInfo.uuid
 
-        this.fileList = this.dialogInfo.avatar ?
-          [{
-            name: 'test',
-            url: this.dialogInfo.avatar
-          }] :
-          []
+        // this.fileList = this.dialogInfo.avatar ? [{
+        //   name: 'test',
+        //   url: this.dialogInfo.avatar
+        // }] : []
       }
     },
     computed: {
       // 判断type
-      IsShowPwd(){
+      IsShowPwd() {
         return this.hidePwd ? 'password' : null
       },
       // 判断输出文字
-      IsShowPwdTxt(){
+      IsShowPwdTxt() {
         return this.hidePwd ? '显示密码' : '隐藏密码'
       }
     },
     async mounted() {
-      // this.GetRoleList()
+
     },
     methods: {
       // 是否显示密码
-      showHidePwd(){
-         this.hidePwd = !this.hidePwd
+      showHidePwd() {
+        this.hidePwd = !this.hidePwd
       },
       // 上传文件之前的钩子
       beforeImgUpload(file) {
@@ -182,20 +200,7 @@
       async onSubmit(formName) {
         this.$refs[formName].validate(async valid => {
           if (valid) {
-            let loading = null
-            try {
-              loading = this.$loading({
-                lock: true,
-                text: 'Loading',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.7)'
-              })
-              this.dialogInfo._id ? this.UpdAPI() : this.AddAPI()
-            } catch (e) {
-              this.$message.error(e)
-            } finally {
-              loading.close()
-            }
+            this.dialogInfo ? this.UpdAPI() : this.AddUser(this.form)
           } else {
             console.log('error submit!!')
             return false
@@ -205,10 +210,13 @@
       // 添加数据
       async AddAPI() {
         try {
-          if(this.fileList.length>0){
+          if (this.fileList.length > 0) {
             this.form.avatar = this.fileList[0].url
           }
-          const {code,msg} = await Register(this.form)
+          const {
+            code,
+            msg
+          } = await Register(this.form)
           if (code === 200) {
             this.$message(msg)
             this.dialogClose()
@@ -273,7 +281,9 @@
 
         //  阿里云  文件上传api
         try {
-          let uploadUrl = this.dialogInfo._id? `/admin-uploadImg/${this.form.account}/${name}_${new Date().getTime()}.${type}`:`/admin-uploadImg/linshi/${name}_${new Date().getTime()}.${type}`
+          let uploadUrl = this.dialogInfo._id ?
+            `/admin-uploadImg/${this.form.account}/${name}_${new Date().getTime()}.${type}` :
+            `/admin-uploadImg/linshi/${name}_${new Date().getTime()}.${type}`
           const res = await this.ali_oss.multipartUpload(
             uploadUrl, copyFile, {
               progress: (p, checkpoint) => {
@@ -305,83 +315,44 @@
           loading.close()
         }
       },
-
-      // 清空表单
-      clear_form() {
-        this.form = {
-          account: '',
-          Nickname: '',
-          birth: '',
-          introduce: '',
-          pwd: '',
-          sex: '',
-          role:""
-        }
-        this.fileList = []
-        this.hidePwd = true
-      },
       dialogClose() {
         this.$emit('update:isShowDialog', false)
-        this.$emit('update:dialog-info', '')
-        // this.$refs['form'].resetFields();
-        this.clear_form()
+        this.$emit('update:dialog-info', null)
+        this.onReset_form()
       },
-      /** *****************************************************************  接口处理部分****************************************************/
-      async GetRoleList(){
-        let {code,data,msg} = await GetRoleInfo()
-        if(code===200){
-          this.RoleList = data
+      /*===================================================工具函数相关===============================================*/
+      onReset_form(){
+        this.$refs['form'].resetFields();
+      },
+      /*===================================================接口相关===============================================*/
+      // 添加用户信息
+      async AddUser(params) {
+        loadingInstance = Loading.service({
+          fullscreen: true,
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
+        try {
+          let {code} = await api_addUser(params)
+          if(code=='M200'){
+            this.$message.success("添加用户成功!")
+            this.$emit('updateList');
+            this.dialogClose();
+          }
+        } catch (e) {
+
+        } finally {
+          loadingInstance.close()
         }
       }
     }
   }
 </script>
 
-<style lang="scss" scoped>
-  .yp {
-    padding: 20px;
-
-    .el-row {
-      // padding: 10px 0;
-    }
-
-    .submit-bth {
-      width: 100%;
-    }
-  }
-
-  .down-list {
-    color: gray;
-    font-size: 14px;
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-
-    .first-line {
-      width: inherit;
-      box-sizing: border-box;
-      padding: 0 10px;
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 0 0 0;
-    }
-
-    .second-line {
-      position: relative;
-      background-color: #e4dfdf;
-      width: 100%;
-      height: 4px;
-      border-radius: 50px;
-      margin: 4px 0 10px 0;
-
-      .progress {
-        height: inherit;
-        border-radius: 50px;
-        position: absolute;
-        background-color: skyblue;
-      }
-    }
+<style lang="less" scoped="scoped">
+  /deep/ .el-dialog,el-dialog--center,cust_dialog,.cust_dialog {
+    border-radius:10px;
   }
 </style>
