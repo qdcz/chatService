@@ -49,6 +49,7 @@ class role extends Service {
     } catch (err) {
         await conn.rollback();
         throw err;
+        return null;
     }
   }
 }

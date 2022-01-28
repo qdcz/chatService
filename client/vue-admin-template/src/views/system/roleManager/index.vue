@@ -62,7 +62,8 @@
     <!-- 分页器 -->
     <el-pagination 
       style="margin-top:10px;margin-left:-10px;" 
-      background layout="sizes, total ,prev, pager, next" :total="pageTotal"
+      background layout="sizes, total ,prev, pager, next, jumper" 
+      :total="pageTotal"
       @size-change="pagination_sizeChange"
       @current-change="pagination_currentChange"
       @prev-click="pagination_prevNextClick"
@@ -84,6 +85,8 @@
     api_roleUpd,
     api_roleDel
   } from '@/api/adminRole.js';
+  let loadingInstance = "加载中...";
+  
   
   export default {
     data() {

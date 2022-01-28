@@ -5,6 +5,9 @@ const login = require("./login");
 const userInfo = require("./userInfo");
 const logout = require("./logout");
 const userList = require("./userList");
+const addUser = require("./addUser");
+const delUser = require("./delUser");
+
 
 class UserController extends Controller {
   async register() {
@@ -21,6 +24,12 @@ class UserController extends Controller {
   }
   async userList() {
     return userList(this.ctx);
+  }
+  async addUser() {
+    return addUser(this.ctx);
+  }
+  async delUser() {
+    return delUser(this.ctx);
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="dialogs">
-    <el-dialog title="修改个人信息" :visible.sync="isshowDialogs" width="60%" center @close="dialogClose">
+    <el-dialog title="修改个人信息" :visible.sync="isShowDialog" width="60%" center @close="dialogClose">
       <el-form ref="form" :model="form" class="el-form" :rules="rules" label-width="80px" label-position="left">
         <el-form-item label="账号" prop="account">
           <el-input v-model="form.account" size="large" :disabled="dialogInfo._id?true:null" />
@@ -58,7 +58,7 @@
   // import {API$DelOssFile} from '../../../../api/YangPan/OSS.js'
   // import { mapGetters } from 'vuex'
   export default {
-    props: ['isshowDialogs', 'dialogInfo'],
+    props: ['isShowDialog', 'dialogInfo'],
     data() {
       // 自定义密码校验规则
       var validatePwd = (rule, value, callback) => {
@@ -321,7 +321,7 @@
         this.hidePwd = true
       },
       dialogClose() {
-        this.$emit('update:isshowDialogs', false)
+        this.$emit('update:isShowDialog', false)
         this.$emit('update:dialog-info', '')
         // this.$refs['form'].resetFields();
         this.clear_form()
@@ -331,25 +331,6 @@
         let {code,data,msg} = await GetRoleInfo()
         if(code===200){
           this.RoleList = data
-        }
-      },
-      /** *****************************************************************  OSS处理部分****************************************************/
-      // 删除oss文件
-      async DelOssFile(dir) {
-        try {
-          await API$DelOssFile({
-            filePath: dir
-          })
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-          this.fileList = []
-          this.$refs.upload.clearFiles()
-        } catch (e) {
-          this.$message.error(e)
-        } finally {
-
         }
       }
     }

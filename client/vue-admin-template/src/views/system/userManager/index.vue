@@ -3,7 +3,7 @@
     <!-- 查询条件 -->
     <div class="filter-container">
       <el-form :inline="true" :model="QuerySelect" size="mini">
-        <el-form-item label="昵称" prop="Nickname"><el-input v-model="QuerySelect.Nickname" size="mini" clearable placeholder="请输入昵称" /></el-form-item>
+        <el-form-item label="昵称" prop="name"><el-input v-model="QuerySelect.name" size="mini" clearable placeholder="请输入昵称" /></el-form-item>
         <el-form-item label="账号" prop="account"><el-input v-model="QuerySelect.account" clearable size="mini" placeholder="请输入账号" /></el-form-item>
         <el-form-item label="性别" prop="sex">
           <el-select v-model="QuerySelect.sex" clearable style="width:150px" placeholder="请选择性别">
@@ -38,26 +38,39 @@
       </el-form>
     </div>
 
+    
+
+    <el-button type="primary" icon="el-icon-plus" @click="isShowDialog=true">添加新用户</el-button>
+    
     <!-- 添加编辑的dialog -->
-    <add-dialog :isshow-dialogs.sync="isshowDialogs" :dialog-info.sync="DialogInfo" @updateList="getUserList" />
-
-    <el-button type="primary" icon="el-icon-plus" @click="isshowDialogs=true">添加新用户</el-button>
+    <add-dialog 
+      :isShow-dialogs.sync="isShowDialog" 
+      :dialog-info.sync="DialogInfo" 
+      @updateList="getUserList" 
+    />
+    
     <!-- 表格内容 -->
-    <tables class="mt20" :list="DataList" :list-loading.sync="listLoading" :isshow-dialogs.sync="isshowDialogs" :dialog-info.sync="DialogInfo" @updateList="getUserList" />
-
+    <tables class="mt20"
+      :list="userList"
+      :list-loading.sync="listLoading"
+      :isShow-dialogs.sync="isShowDialog"
+      :dialog-info.sync="DialogInfo"
+      @updateList="getUserList"
+    />
 
     <!-- 分页器 -->
-    <div class=" mt20">
-      <el-pagination
-        :current-page="QuerySelect.pageNumber"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="QuerySelect.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="QuerySelect.pageTotal"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </div>
+    <el-pagination
+      style="margin-top:10px;margin-left:-10px;"
+      :current-page="QuerySelect.pageNumber"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="QuerySelect.pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="QuerySelect.pageTotal"
+      @size-change="pagination_sizeChange"
+      @current-change="pagination_currentChange"
+      @prev-click="pagination_prevNextClick"
+      @next-click="pagination_prevNextClick"
+    />
   </div>
 </template>
 
@@ -83,41 +96,22 @@ export default {
   components: { tables, addDialog, CitySelect },
   data() {
     return {
-      QuerySelect: {
-        // 条件查询参数
-        pageNumber: 1, // 分页下标(用户信息)
-        pageSize: 10, // 分页大小(用户信息)
-        pageTotal:0,   // 总数大小(用户信息)
-        Nickname: '',
-        account: '',
-        sex: '',
-        Region: '',
-        IsCurrentUse: '',
-        birthBeginTime: '',
-        birthEndTime: '',
-        registerTimeBeginTime: '',
-        registerTimeEndTime: '',
-
-        provinceId:"",
-        cityId:"",
-        areaId:""
-      },
-
+      QuerySelect:{}, // 条件查询参数
       listLoading: false,
       userList: [], // 用户列表数据
       roleList:[],  // 角色列表
-      isshowDialogs: false, // 是否显示发布弹窗
+      isShowDialog: false, // 是否显示发布弹窗
       DialogInfo: '', // 表格内查看编辑带给dialog的数据
-      total: 0 // 分页器总数
     }
   },
   created() {
-    this.getUserList(this.QuerySelect.pageSize,this.QuerySelect.pageNumber);
+    this.onReset();
+    this.getUserList(this.QuerySelect);
     this.getRoleList(10000,1);
   },
   methods: {
     onAddUser() {
-      this.isshowDialogs = true
+      this.isShowDialog = true
     },
     CitySelectOnchange(e){
       this.QuerySelect.provinceId = e.provinceId
@@ -127,30 +121,28 @@ export default {
       this.QuerySelect.Region = arr[0]? arr[0] + (arr[1]? '-'+arr[1]: "") + (arr[2]? '-'+arr[2]: "") : ""
     },
     onSelect() {
-      const json = JSON.parse(JSON.stringify(this.QuerySelect))
-      // console.log(new Date(`${this.QuerySelect['registerTimeBeginTime'].getTime()}`))
-      // json['registerTimeBeginTime'] = this.QuerySelect['registerTimeBeginTime'].getTime() || ''
-      // json['registerTimeEndTime'] = this.QuerySelect['registerTimeEndTime'].getTime() || ''
-      this.getUserList(json)
+      this.getUserList(this.QuerySelect)
     },
-    // 分页器 条数发生变化
-    handleSizeChange(val) {
-      this.QuerySelect.pageSize = val
-      this.QuerySelect.pageNum = 0
-      const json = JSON.parse(JSON.stringify(this.QuerySelect))
-      this.getUserList(json)
+    // 页数大小改变
+    pagination_sizeChange(e) {
+      this.QuerySelect.pageSize = e;
+      this.getUserList(this.QuerySelect);
     },
-    // 分页器 页数发生变化
-    handleCurrentChange(val) {
-      this.QuerySelect.pageNum = val - 1
-      const json = JSON.parse(JSON.stringify(this.QuerySelect))
-      this.getUserList(json)
+    pagination_currentChange(e) {
+      this.QuerySelect.pageNumber = e
+      this.getUserList(this.QuerySelect)
     },
-    onReset() {
-      this.QuerySelect = {
-        pageNum: 0,
-        pageSize: 10,
-        Nickname: '',
+    pagination_prevNextClick(e){
+      this.pageNumber = e
+      this.getRoleList(this.pageSize,this.pageNumber)
+    },
+    /*===================================================工具函数相关===============================================*/
+    GetQuerySelectDefault(){
+      return {
+        pageNumber: 1, // 分页下标(用户信息)
+        pageSize: 10, // 分页大小(用户信息)
+        pageTotal:0,   // 总数大小(用户信息)
+        name: '',
         account: '',
         sex: '',
         Region: '',
@@ -159,37 +151,17 @@ export default {
         birthEndTime: '',
         registerTimeBeginTime: '',
         registerTimeEndTime: '',
-
         provinceId:"",
         cityId:"",
         areaId:""
-      }
+      };
     },
-    async getUserList(json) {
-      json = json || { pageNum: this.QuerySelect.pageNum, pageSize: this.QuerySelect.pageSize }
-      try {
-        this.listLoading = true
-        const { code, msg, total, data } = await GetUserList(json)
-        if (code === 200) {
-          this.$message({
-            message: msg,
-            type: 'success'
-          })
-          for (let i = 0, item; (item = data[i]); i++) {
-            item['i'] = i + 1
-          }
-          this.total = total
-          this.DataList = data
-        }
-      } catch (e) {
-        console.log(e)
-      } finally {
-        this.listLoading = false
-      }
+    onReset() {
+      this.QuerySelect = this.GetQuerySelectDefault();
     },
     /*===================================================接口相关===============================================*/
     // 查询用户信息列表
-    async getUserList(pageSize, pageNumber) {
+    async getUserList(params) {
       loadingInstance = Loading.service({
         fullscreen: true
       })
@@ -198,11 +170,8 @@ export default {
           code,
           data,
           total
-        } = await api_UserList({
-          pageSize,
-          pageNumber
-        })
-        this.userList = data
+        } = await api_UserList(params)
+        this.userList = data.map((i,index)=>{i.orderNumber = index+1;return i})
         this.pageTotal = total
         this.$message.success("用户列表查询成功!")
       } catch (e) {
@@ -212,6 +181,27 @@ export default {
       }
     },
     // 查询角色信息列表
+    async getRoleList(pageSize, pageNumber) {
+      loadingInstance = Loading.service({
+        fullscreen: true
+      })
+      try {
+        let {
+          code,
+          data,
+        } = await api_roleList({
+          pageSize,
+          pageNumber
+        })
+        this.roleList = data
+        this.$message.success("角色列表查询成功!")
+      } catch (e) {
+
+      } finally {
+        loadingInstance.close()
+      }
+    },
+    // 添加用户信息
     async getRoleList(pageSize, pageNumber) {
       loadingInstance = Loading.service({
         fullscreen: true

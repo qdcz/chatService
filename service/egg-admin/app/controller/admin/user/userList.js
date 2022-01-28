@@ -5,6 +5,7 @@ let {codeMap} = require("../../../utils/index");
 module.exports = async function (ctx) {
     try{
         const {pageSize,pageNumber} = ctx.request.body;
+        console.log(pageSize,pageNumber)
         if(!(pageSize && pageNumber)) return ctx.body = codeMap('M201');
         if(pageNumber=='0') return ctx.body = codeMap('M201');
 
