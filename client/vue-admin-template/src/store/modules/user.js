@@ -1,5 +1,7 @@
 // import { login, logout, getInfo } from '@/api/user'
 import { api_login,api_getUserInfo } from '@/api/adminUser'
+import { api_roleInfo } from '@/api/adminRole'
+
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -57,10 +59,13 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
         const { name, avatar,roleId } = data
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_ROLENAME', roleId)
-        resolve(data)
+        api_roleInfo({uuid:roleId}).then(res=>{
+          commit('SET_NAME', name)
+          commit('SET_AVATAR', avatar)
+          commit('SET_ROLENAME', res.data.roleName)
+          // data = Object.assign(data,{roleName:res.data.roleName})
+          resolve(data)
+        })
       }).catch(error => {
         reject(error)
       })

@@ -4,6 +4,7 @@ const addRole = require("./addRole");
 const delRole = require("./delRole");
 const updRole = require("./updRole");
 const selRoleList = require("./selRoleList");
+const selRoleInfo = require("./selRoleInfo");
 
 class UserController extends Controller {
   async addRole() {
@@ -17,6 +18,9 @@ class UserController extends Controller {
   }
   async selRoleList() {
     return selRoleList(this.ctx);
+  }
+  async selRoleInfo() {
+    return selRoleInfo(this.ctx);
   }
 }
 

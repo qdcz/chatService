@@ -3,7 +3,8 @@ exports.mysql = {
   // 单数据库信息配置
   client: {
     // host
-    host: '192.168.237.128',
+    // host: '192.168.237.128',
+    host: '192.168.16.128',
     // 端口号
     port: '3306',
     // 用户名
@@ -24,7 +25,8 @@ exports.redis = {
   Redis: require('ioredis'),
   client: {
     port: 6379,          // Redis port
-    host: '192.168.237.128',   // Redis host
+    // host: '192.168.237.128',   // Redis host
+    host: '192.168.16.128',
     name:"default",
     password: '123456',
     db:1,

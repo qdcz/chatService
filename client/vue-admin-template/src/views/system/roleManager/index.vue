@@ -32,7 +32,7 @@
     </el-table>
 
     <!-- 添加角色弹窗 -->
-    <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'edit' ? '编辑角色' : '新建角色'" @close="onCancel">
+    <el-dialog :visible.sync="dialogVisible" :title="dialogType === 'edit' ? '编辑角色' : '新建角色'" @close="onCancel" customClass='cust_dialog'>
       <el-form ref='roleDialog' :model="role_formData" label-width="80px" label-position="left" :rules="roleRules">
         <el-form-item label="角色名字" prop="roleName">
           <el-input v-model="role_formData.roleName" placeholder="请输入角色名字" />
@@ -394,7 +394,7 @@
   }
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
   .app-container {
     .roles-table {
       margin-top: 30px;
@@ -403,5 +403,10 @@
     .permission-tree {
       margin-bottom: 30px;
     }
+  }
+
+
+  /deep/ .el-dialog,el-dialog--center,cust_dialog,.cust_dialog {
+    border-radius:10px;
   }
 </style>

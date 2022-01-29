@@ -59,8 +59,8 @@ export const api_delUser = (data) => {
 export const api_updUser = (data) => {
   const R = Object.assign({}, data)
   return request({
-    // url: '/admin/user',
-    // method: 'post',
+    url: '/admin/userInfo',
+    method: 'put',
     data:R,
     headers:{'Content-Type': 'application/json;charset=utf-8'},
   })

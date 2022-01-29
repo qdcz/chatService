@@ -53,3 +53,16 @@ export const api_roleDel = (data) => {
     },
   })
 }
+
+// 查询角色信息
+export const api_roleInfo = (data) => {
+  const R = Object.assign({}, data);
+  return request({
+    url: '/admin/roleInfo',
+    method: 'post',
+    data: R,
+    headers: {
+      'Content-Type': 'application/json;charset=utf-8'
+    },
+  })
+}

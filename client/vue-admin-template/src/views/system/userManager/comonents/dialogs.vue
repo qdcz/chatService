@@ -18,7 +18,7 @@
           </div>
         </el-form-item>
         <el-form-item label="角色" prop="roleId">
-          <el-select v-model="form.roleId" placeholder="选择角色" style="padding: 0;" clearable>
+          <el-select v-model="form.roleId" placeholder="选择角色" style="padding: 0;" clearable @change="selectInput_change">
             <el-option :label="i.roleName" :value="i.uuid" v-for="i in RoleList" :key='i.uuid' />
           </el-select>
         </el-form-item>
@@ -43,8 +43,8 @@
               style="width: 100%;" />
           </el-col>
         </el-form-item>
-        <el-form-item label="简介" prop="introduce">
-          <el-input v-model="form.introduce" size="large" placeholder="简介" type="textarea"
+        <el-form-item label="简介" prop="introduction">
+          <el-input v-model="form.introduction" size="large" placeholder="简介" type="textarea"
             :autosize="{ minRows: 2, maxRows: 8 }" />
         </el-form-item>
         <el-form-item label="性别" prop="sex">
@@ -65,11 +65,24 @@
     Loading
   } from 'element-ui';
   import {
-    api_addUser
+    api_addUser,api_updUser
   } from '@/api/adminUser.js';
   let loadingInstance = "加载中...";
   export default {
-    props: ['isShowDialog', 'dialogInfo', 'RoleList'],
+    props: {
+      isShowDialog: {
+        type: Boolean,
+        default: false
+      },
+      dialogInfo: {
+        type: Object,String,
+        default: ()=>{}
+      },
+      RoleList: {
+        type: Array,
+        default: []
+      }
+    },
     data() {
       // 自定义密码校验规则
       var validatePwd = (rule, value, callback) => {
@@ -97,7 +110,8 @@
           phone: '',
           address: '',
           introduction: '',
-          avatar: ''
+          avatar: '',
+          ___test:"", // 饿了么的下拉选择框组件 深度相应数据不行
         },
         rules: {
           account: [{
@@ -118,16 +132,17 @@
       dialogInfo() {
         console.log('触发监听')
         // this.form = JSON.parse(JSON.stringify(this.dialogInfo))
-        
-        this.form.account = this.dialogInfo.account
-        this.form.password = this.dialogInfo.password
-        this.form.name = this.dialogInfo.name
-        this.form.roleId = this.dialogInfo.roleId
-        this.form.address = this.dialogInfo.address
-        this.form.introduction = this.dialogInfo.introduction
-        this.form.sex = this.dialogInfo.sex
-        this.form.phone = this.dialogInfo.phone
-        this.form.uuid = this.dialogInfo.uuid
+        if(this.dialogInfo){
+          this.form.account = this.dialogInfo.account
+          this.form.password = this.dialogInfo.password
+          this.form.name = this.dialogInfo.name
+          this.form.roleId = this.dialogInfo.roleId
+          this.form.address = this.dialogInfo.address
+          this.form.introduction = this.dialogInfo.introduction
+          this.form.sex = this.dialogInfo.sex
+          this.form.phone = this.dialogInfo.phone
+          this.form.uuid = this.dialogInfo.uuid
+        }
 
         // this.fileList = this.dialogInfo.avatar ? [{
         //   name: 'test',
@@ -200,7 +215,7 @@
       async onSubmit(formName) {
         this.$refs[formName].validate(async valid => {
           if (valid) {
-            this.dialogInfo ? this.UpdAPI() : this.AddUser(this.form)
+            this.dialogInfo ? this.UpdUser(this.form) : this.AddUser(this.form)
           } else {
             console.log('error submit!!')
             return false
@@ -315,6 +330,16 @@
           loading.close()
         }
       },
+
+
+      selectInput_change(e){
+        this.form.___test = this.form.name
+        this.form.roleId = e
+        this.form.name = Math.random()
+        this.$nextTick(()=>{
+          this.form.name = this.form.___test
+        })
+      },
       dialogClose() {
         this.$emit('update:isShowDialog', false)
         this.$emit('update:dialog-info', null)
@@ -322,7 +347,18 @@
       },
       /*===================================================工具函数相关===============================================*/
       onReset_form(){
-        this.$refs['form'].resetFields();
+        // this.$refs['form'].resetFields();
+        this.form = {
+          account: '',
+          password: '',
+          name: '',
+          sex: "",
+          phone: '',
+          address: '',
+          introduction: '',
+          avatar: '',
+          ___test:""  // 饿了么的下拉选择框组件 深度相应数据不行
+        }
       },
       /*===================================================接口相关===============================================*/
       // 添加用户信息
@@ -338,6 +374,28 @@
           let {code} = await api_addUser(params)
           if(code=='M200'){
             this.$message.success("添加用户成功!")
+            this.$emit('updateList');
+            this.dialogClose();
+          }
+        } catch (e) {
+
+        } finally {
+          loadingInstance.close()
+        }
+      },
+      // 更新用户信息
+      async UpdUser(params) {
+        loadingInstance = Loading.service({
+          fullscreen: true,
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
+        try {
+          let {code} = await api_updUser(params)
+          if(code=='M200'){
+            this.$message.success("修改用户成功!")
             this.$emit('updateList');
             this.dialogClose();
           }

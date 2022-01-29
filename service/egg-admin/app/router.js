@@ -19,6 +19,7 @@ module.exports = app => {
   router.post('/admin/role', controller.admin.role.index.addRole);  // 后台管理模板-添加角色信息
   router.put('/admin/role', controller.admin.role.index.updRole);  // 后台管理模板-修改角色信息
   router.delete('/admin/role', controller.admin.role.index.delRole);  // 后台管理模板-删除角色
+  router.post('/admin/roleInfo', controller.admin.role.index.selRoleInfo);  // 后台管理模板-查询角色信息
 
 
   router.post('/admin/router', controller.admin.router.index.addRouter);  // 后台管理模板-添加路由信息

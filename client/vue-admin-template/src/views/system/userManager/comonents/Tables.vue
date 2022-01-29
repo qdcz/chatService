@@ -12,7 +12,7 @@
           <span>{{ scope.row.name || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="140" align="center" label="账号" show-overflow-tooltip sortable prop="uuid">
+      <el-table-column width="140" align="center" label="uuid" show-overflow-tooltip sortable prop="uuid">
         <template slot-scope="scope">
           <span>{{ scope.row.uuid || '-' }}</span>
         </template>
@@ -59,7 +59,7 @@
 
 <script>
   import {
-    api_delUser
+    api_delUser,api_getUserInfo
   } from '@/api/adminUser.js';
   export default {
     name: 'Tables',
@@ -95,8 +95,7 @@
       },
       // 查看按钮
       tableItemDetail(e) {
-        this.$emit('update:isShowDialog', true)
-        this.$emit('update:dialogInfo', e)
+        this.SelUserInfo(e.uuid)
       },
       // 启用/禁用按钮
       async tableItemUse(e) {
@@ -152,7 +151,36 @@
         } finally {
           loading.close()
         }
-      }
+      },
+      // 查询用户详细信息
+      async SelUserInfo(uuid) {
+        let loading = null
+        try {
+          loading = this.$loading({
+            lock: true,
+            text: 'Loading',
+            spinner: 'el-icon-loading',
+            background: 'rgba(0, 0, 0, 0.7)'
+          })
+          const {
+            code,
+            data,
+            msg
+          } = await api_getUserInfo({uuid})
+          if (code === 'M200') {
+            this.$message({
+              message: msg,
+              type: 'success'
+            })
+            this.$emit('update:isShowDialog', true)
+            this.$emit('update:dialogInfo',data)
+          }
+        } catch (e) {
+          console.log(e)
+        } finally {
+          loading.close()
+        }
+      },
     }
   }
 </script>

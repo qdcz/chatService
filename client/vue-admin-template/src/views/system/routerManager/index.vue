@@ -25,7 +25,7 @@
 
 
     <!-- 弹窗 -->
-    <el-dialog :title="DialogTitle" :visible.sync="isshowDialogs" width="60%" center @close="dialogClose('DialogForm')">
+    <el-dialog :title="DialogTitle" :visible.sync="isshowDialogs" width="60%" center @close="dialogClose('DialogForm')" customClass='cust_dialog'>
       <el-form ref="DialogForm" :model="DialogForm" class="el-form" :rules="rules" label-width="80px"
         label-position="left">
         <el-form-item label="路由名字" prop="routerName" label-width="100px">
@@ -343,7 +343,7 @@
   };
 </script>
 
-<style>
+<style lang="less" scoped>
   .custom-tree-container {
     padding: 20px;
   }
@@ -355,5 +355,9 @@
     justify-content: space-between;
     font-size: 14px;
     padding-right: 8px;
+  }
+
+  /deep/ .el-dialog,el-dialog--center,cust_dialog,.cust_dialog {
+    border-radius:10px;
   }
 </style>

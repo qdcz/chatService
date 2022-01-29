@@ -32,14 +32,13 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" @click="onSelect">查询</el-button>
-          <el-button type="default" icon="el-icon-reset" @click="onReset">重置</el-button>
+          <el-button type="info" icon="el-icon-reset" @click="onReset">重置</el-button>
+          <el-button type="success" icon="el-icon-plus" @click="isShowDialog=true">添加新用户</el-button>
+          <!-- <el-button type="primary" icon="el-icon-edit"></el-button> -->
+          <!-- <el-button icon="el-icon-search" circle></el-button> -->
         </el-form-item>
       </el-form>
     </div>
-
-
-
-    <el-button type="primary" icon="el-icon-plus" @click="isShowDialog=true">添加新用户</el-button>
 
     <!-- 添加编辑的dialog -->
     <add-dialog

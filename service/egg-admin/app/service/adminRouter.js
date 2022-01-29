@@ -1,11 +1,6 @@
 // app/service/adminRouter.js
 const Service = require("egg").Service;
 
-const recursionDelRouter = (id)=>{
-
-}
-
-
 class role extends Service {
     // 添加角色
   async addRouter(valueStr){

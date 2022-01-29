@@ -4,7 +4,7 @@ const Service = require("egg").Service;
 class userInfo extends Service {
     // 根据uuid查询用户信息
   async selUserInfoByUuid(uuid){
-    let sql = `select account,password,address,avatar,introduction,name,phone,registerTime,uuid,sex from AdminUserInfo a left join AdminUser b on a.uuid = b.uuid where a.uuid='${uuid}'`;
+    let sql = `select account,password,roleId,address,avatar,introduction,name,phone,registerTime,AdminUser.uuid,sex from AdminUser,AdminUserInfo WHERE AdminUser.uuid=AdminUserInfo.uuid and AdminUser.uuid ='${uuid}'`;
     return await this.app.mysql.query(sql);
   }
     // 查询用户信息列表
