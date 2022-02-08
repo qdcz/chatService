@@ -5,7 +5,8 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
-
+/* Layout */
+import Layout from '@/layout';
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
@@ -27,14 +28,40 @@ router.beforeEach(async(to, from, next) => {
       NProgress.done()
     } else {
       console.log("stage的数据",store.getters)
-      const hasGetUserInfo = store.getters.name
+      const hasGetUserInfo = store.getters.name;
+      const hasGetRouterInfo = store.getters.routerTreeData;
       if (hasGetUserInfo) {
         next()
       } else {
         try {
           // get user info
-          await store.dispatch('user/getInfo')
-          next()
+          let res = await store.dispatch('user/getInfo')
+          let routerTreeData = res.routerTreeData;
+
+          let recur = function(list){
+            list.forEach(i=>{
+              i.component = resolve => {
+                if(!i.pageSrc){
+                  require([`./layout/index.vue`], resolve)
+                }else{
+                  require([i.pageSrc+'.vue'], resolve)
+                }
+              }
+              recur(i.children)
+            })
+          }
+          recur(routerTreeData)
+          router.addRoutes(routerTreeData.slice(0,-1))
+          router.options.routes = router.options.routes.concat(routerTreeData.slice(0,-1))
+          
+          // 页面手动刷新触发
+          if(from.name===null){
+            // 解决刷新动态路由页面的404问题
+            next({path:to.redirectedFrom})
+            return
+          }else{
+            next()
+          }
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')

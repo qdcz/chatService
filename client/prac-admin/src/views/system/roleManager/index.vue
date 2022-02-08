@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" @click="handleAddRole">添加角色</el-button>
+    <el-button type="primary" icon='el-icon-circle-plus-outline' size="mini" @click="handleAddRole">添加角色</el-button>
 
     <el-table :data="rolesList" style="width: 100%;margin-top:6px;" border>
       <el-table-column align="center" label="uuid" width="200">
@@ -60,9 +60,9 @@
 
 
     <!-- 分页器 -->
-    <el-pagination 
-      style="margin-top:10px;margin-left:-10px;" 
-      background layout="sizes, total ,prev, pager, next, jumper" 
+    <el-pagination
+      style="margin-top:10px;margin-left:-10px;"
+      background layout="sizes, total ,prev, pager, next, jumper"
       :total="pageTotal"
       @size-change="pagination_sizeChange"
       @current-change="pagination_currentChange"
@@ -86,8 +86,8 @@
     api_roleDel
   } from '@/api/adminRole.js';
   let loadingInstance = "加载中...";
-  
-  
+
+
   export default {
     data() {
       return {

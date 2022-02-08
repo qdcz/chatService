@@ -4,7 +4,7 @@ const uuidV4 = require("uuid-v4")
 // 添加路由
 module.exports = async function (ctx) {
     try{
-        const {routerName,rootId,parentId,icon,routerFnId} = ctx.request.body;
+        const {routerName,rootId,parentId,icon,routerFnId,routerSrc,pageSrc} = ctx.request.body;
         if(!(routerName)) return ctx.body = codeMap('M201');
 
         const selRouterResult = await ctx.service.adminRouter.selRouterNameIsRepeace(routerName);
@@ -17,7 +17,9 @@ module.exports = async function (ctx) {
                 '${rootId || ""}',
                 '${parentId || ""}',
                 '${icon || ""}',
-                '${routerFnId || ""}'
+                '${routerFnId || ""}',
+                '${routerSrc || ""}',
+                '${pageSrc || ""}'
             `
         );
         if(addResult.affectedRows==1){

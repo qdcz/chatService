@@ -35,6 +35,7 @@ class role extends Service {
     let sql = `delete from AdminUserRole where uuid='${uuid}'`;
     return await this.app.mysql.query(sql);
   }
+
 }
 
 module.exports = role;

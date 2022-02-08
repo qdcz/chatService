@@ -4,12 +4,15 @@ const Service = require("egg").Service;
 class userInfo extends Service {
     // 根据uuid查询用户信息
   async selUserInfoByUuid(uuid){
-    let sql = `select account,password,roleId,address,avatar,introduction,name,phone,registerTime,AdminUser.uuid,sex from AdminUser,AdminUserInfo WHERE AdminUser.uuid=AdminUserInfo.uuid and AdminUser.uuid ='${uuid}'`;
+    let sql = `select account,password,roleId,address,avatar,introduction,name,phone,registerTime,AdminUser.uuid,sex 
+      from AdminUser,AdminUserInfo 
+      WHERE AdminUser.uuid=AdminUserInfo.uuid and AdminUser.uuid ='${uuid}'`;
     return await this.app.mysql.query(sql);
   }
     // 查询用户信息列表
   async selUserList(offset=0,length=10){
-    let sql = `select address,avatar,introduction,name,phone,registerTime,uuid,sex from AdminUserInfo a JOIN (select id from AdminUserInfo limit ${offset}, ${length}) b ON a.ID = b.id`;
+    let sql = `select address,avatar,introduction,name,phone,registerTime,uuid,sex 
+    from AdminUserInfo a JOIN (select id from AdminUserInfo limit ${offset}, ${length}) b ON a.ID = b.id`;
     return await this.app.mysql.query(sql);
   }
     // 根据uuid删除用户

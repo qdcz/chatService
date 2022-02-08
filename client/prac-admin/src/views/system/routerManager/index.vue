@@ -11,7 +11,7 @@
             <el-button type="text" size="mini" @click="() => append(node,data)">
               添加
             </el-button>
-            <el-button type="text" size="mini" @click="() => update(node, data)">
+            <el-button type="text" size="mini" @click="() => edit(node, data)">
               编辑
             </el-button>
             <el-button type="text" size="mini" @click="() => remove(node, data)">
@@ -25,7 +25,7 @@
 
 
     <!-- 弹窗 -->
-    <el-dialog :title="DialogTitle" :visible.sync="isshowDialogs" width="60%" center @close="dialogClose('DialogForm')">
+    <el-dialog :title="DialogTitle" :visible.sync="isshowDialogs" width="60%" center @close="dialogClose('DialogForm')" customClass='cust_dialog'>
       <el-form ref="DialogForm" :model="DialogForm" class="el-form" :rules="rules" label-width="80px"
         label-position="left">
         <el-form-item label="路由名字" prop="routerName" label-width="100px">
@@ -34,11 +34,14 @@
         <el-form-item label="图标" prop="icon" label-width="100px">
           <el-input v-model="DialogForm.icon" size="large" />
         </el-form-item>
-        <el-form-item label="路径" prop="path" label-width="100px">
-          <el-input v-model="DialogForm.path" size="large" />
+        <el-form-item label="路由路径" prop="routerSrc" label-width="100px">
+          <el-input v-model="DialogForm.routerSrc" size="large" />
+        </el-form-item>
+        <el-form-item label="页面路径" prop="pageSrc" label-width="100px">
+          <el-input v-model="DialogForm.pageSrc" size="large" />
         </el-form-item>
         <el-button type="primary" @click="submitDialogForm('DialogForm')">
-          {{DialogTitle==='添加路由信息' || DialogTitle==='添加根路由' ?'添加':'修改'}}
+          {{DialogTitle==='添加根路由' || DialogTitle==='添加子路由' ?'添加':'修改'}}
         </el-button>
         <el-button @click="dialogClose('DialogForm')">取消</el-button>
       </el-form>
@@ -61,17 +64,20 @@
   export default {
     data() {
       return {
-        data: [],
+        data: [],      // 树级结构数据
         pageNumber: 1, // 分页下标
-        pageSize: 100, // 分页大小
+        pageSize: 9999, // 分页大小
         DialogTitle: "添加路由信息",
         isshowDialogs: false,  // 弹窗
         DialogForm: {
+          uuid:"",
           routerName: "",
           icon: "",
           parentId: "",
           rootId: "",
           routerFnId: "",
+          routerSrc:"",
+          pageSrc:"",
         },
         rules: {
           routerName: [{
@@ -121,8 +127,10 @@
        * @param {Object} node 节点属性
        * @param {Object} data 节点数据
        */
-      update(node, data) {
-        console.log(node, data)
+      edit(node, data) {
+        this.isshowDialogs = true
+        this.DialogTitle = '修改路由信息'
+        this.DialogForm = Object.assign(this.DialogForm,data)
       },
       /**
        * 添加根级节点信息
@@ -139,11 +147,14 @@
         this.isshowDialogs = false
         this.curSelectNodeData = null
         this.DialogForm = {
+          uuid:"",
           routerName: "",
           icon: "",
           parentId: "",
           rootId: "",
           routerFnId: "",
+          routerSrc:"",
+          pageSrc:""
         }
         // this.$refs[formName].resetFields();
       },
@@ -167,6 +178,8 @@
                 rootId:this.curSelectNodeData.uuid,
                 parentId:this.curSelectNodeData.uuid
               }))
+            }else if(this.DialogTitle === '修改路由信息'){
+              this.updRouter(Object.assign(this.DialogForm,{}))
             }
           }
         });
@@ -283,9 +296,8 @@
         }
       },
       /**
-       * 删除路由信息
+       * 删除路由信息  删除后级联删除
        * @param {Object} uuid
-       * TODO  删除后级联删除
        */
       async delRouter(uuid) {
         loadingInstance = Loading.service({
@@ -307,13 +319,38 @@
           loadingInstance.close()
           this.dialogClose()
         }
+      },
+      /**
+       * 更新路由信息
+       * TODO  要求能随意变换位置
+       * @param {Object} uuid
+       * @param {Object} icon
+       * @param {Object} path
+       */
+      async updRouter(paramsObj) {
+        loadingInstance = Loading.service({
+          fullscreen: true
+        })
+        try {
+          let {
+            code,
+            data,
+            msg
+          } = await api_routerUpd(paramsObj)
+          this.$message.success("更新成功!")
+          await this.getRouterList(this.pageSize, this.pageNumber);
+        } catch (e) {
+
+        } finally {
+          loadingInstance.close()
+          this.dialogClose()
+        }
       }
-      // TODO 修改路由信息接口   要求能随意变换位置
     }
   };
 </script>
 
-<style>
+<style lang="less" scoped>
   .custom-tree-container {
     padding: 20px;
   }
@@ -325,5 +362,9 @@
     justify-content: space-between;
     font-size: 14px;
     padding-right: 8px;
+  }
+
+  /deep/ .el-dialog,el-dialog--center,cust_dialog,.cust_dialog {
+    border-radius:10px;
   }
 </style>

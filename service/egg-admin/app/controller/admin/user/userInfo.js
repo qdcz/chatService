@@ -1,5 +1,5 @@
 'use strict';
-let {codeMap} = require("../../../utils/index");
+let {codeMap,addQuotationMarksForString,flatDataToTreeData} = require("../../../utils/index");
 
 // 查看/修改用户信息
 module.exports = async function (ctx) {
@@ -16,13 +16,22 @@ module.exports = async function (ctx) {
         }
         
         if(ctx.request.method == 'POST'){  // 查信息
-            let result = await ctx.service.adminUser.selUserInfoByUuid(uuid);
-            return ctx.body = Object.assign(codeMap('M200'),{data:result[0]});
-        }else if(ctx.request.method == 'PUT'){ 
+            let UserInfoResult = await ctx.service.adminUser.selUserInfoByUuid(uuid);
+            let RoleInfoResult = await ctx.service.adminRole.selRoleInfoByUuid(UserInfoResult[0].roleId);
+            let routerIds = RoleInfoResult[0].routerId;
+            let routerIdsForSql =  addQuotationMarksForString(routerIds);                           // sql语句
+            let routerInfo = await ctx.service.adminRouter.selRouterInfoByUuids(routerIdsForSql);  // 此角色包含的路由信息列表
+            let allRouterList = await ctx.service.adminRouter.selRouterList(0,9999);  // 数据库中的所有路由信息
+            let routerTreeData = flatDataToTreeData(routerInfo,allRouterList);       // 此角色包含的路由信息组合而成的路由树数据
+
+            UserInfoResult[0].routerInfo = routerInfo;
+            UserInfoResult[0].routerTreeData = routerTreeData;
+            return ctx.body = Object.assign(codeMap('M200'),{data:UserInfoResult[0]});
+        }else if(ctx.request.method == 'PUT'){ // 更新信息
             let params = ctx.request.body;
             const conn = await ctx.app.mysql.beginTransaction(); // 初始化事务
             try {
-                // TODO 改造成sql语句   写连表更新
+                // TODO 改造成sql语句   写联表更新
                 await ctx.app.mysql.update('AdminUser',params,{
                     where: { uuid },
                     columns: [ 'password', 'roleId' ]

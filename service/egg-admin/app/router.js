@@ -15,6 +15,7 @@ module.exports = app => {
   router.post('/admin/user', controller.admin.user.index.addUser);  // 后台管理模板-添加用户
   router.post('/admin/userList', controller.admin.user.index.userList);  // 后台管理模板-用户列表
 
+  
   router.post('/admin/roleList', controller.admin.role.index.selRoleList);  // 后台管理模板-获取角色列表
   router.post('/admin/role', controller.admin.role.index.addRole);  // 后台管理模板-添加角色信息
   router.put('/admin/role', controller.admin.role.index.updRole);  // 后台管理模板-修改角色信息

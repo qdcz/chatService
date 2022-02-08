@@ -1,5 +1,5 @@
 // import { login, logout, getInfo } from '@/api/user'
-import { api_login,api_getUserInfo } from '@/api/adminUser'
+import { api_login,api_getUserInfo,api_logout} from '@/api/adminUser'
 import { api_roleInfo } from '@/api/adminRole'
 
 import { getToken, setToken, removeToken } from '@/utils/auth'
@@ -10,7 +10,8 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     avatar: '',
-    roleName:''
+    roleName:'',
+    routerTreeData:''
   }
 }
 
@@ -32,7 +33,11 @@ const mutations = {
   },
   SET_ROLENAME: (state, roleName) => {
     state.roleName = roleName
+  },
+  SET_routerTreeData: (state, routerTreeData) => {
+    state.routerTreeData = routerTreeData
   }
+
 }
 
 const actions = {
@@ -58,11 +63,12 @@ const actions = {
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
-        const { name, avatar,roleId } = data
+        const { name, avatar,roleId,routerTreeData } = data
         api_roleInfo({uuid:roleId}).then(res=>{
           commit('SET_NAME', name)
           commit('SET_AVATAR', avatar)
-          commit('SET_ROLENAME', res.data.roleName)
+          commit('SET_routerTreeData', routerTreeData)
+          commit('SET_ROLENAME', res.data[0]?.roleName)
           // data = Object.assign(data,{roleName:res.data.roleName})
           resolve(data)
         })
@@ -75,7 +81,7 @@ const actions = {
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
+      api_logout().then(() => {
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')

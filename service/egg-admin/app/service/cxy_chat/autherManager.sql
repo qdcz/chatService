@@ -39,6 +39,8 @@ CREATE TABLE AdminUserRouter (
     parentId varchar(50) COMMENT '父级id',
     icon varchar(50) COMMENT '路由图标',
     routerFnId varchar(255) COMMENT '功能id',
+    routerSrc varchar(255) COMMENT '路由路径',
+    pageSrc varchar(255) COMMENT '页面路径',
     PRIMARY KEY (id)
 ) COMMENT='用户路由表';
 

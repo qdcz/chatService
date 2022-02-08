@@ -4,7 +4,7 @@ const Service = require("egg").Service;
 class role extends Service {
     // 添加角色
   async addRouter(valueStr){
-    let sql = `insert into AdminUserRouter (uuid,routerName,rootId,parentId,icon,routerFnId) values (${valueStr})`;
+    let sql = `insert into AdminUserRouter (uuid,routerName,rootId,parentId,icon,routerFnId,routerSrc,pageSrc) values (${valueStr})`;
     return await this.app.mysql.query(sql);
   }
     // 查询路由名字是否重复
@@ -14,7 +14,7 @@ class role extends Service {
   }
     // 根据分页查询所有路由列表
   async selRouterList(offset=0,length=10) {
-    let sql = `SELECT uuid,routerName,rootId,parentId,icon,routerFnId FROM AdminUserRouter a JOIN (select id from AdminUserRouter limit ${offset}, ${length}) b ON a.ID = b.id`;
+    let sql = `SELECT uuid,routerName,rootId,parentId,icon,routerFnId,routerSrc,pageSrc FROM AdminUserRouter a JOIN (select id from AdminUserRouter limit ${offset}, ${length}) b ON a.ID = b.id`;
     return await this.app.mysql.query(sql);
   }
     // 根据uuid更新路由信息
@@ -24,6 +24,16 @@ class role extends Service {
         uuid
       }
     })
+  }
+    // 根据uuid查询路由及子路由信息
+  async selCorrelationRouterInfoByUuid(uuid) {
+    let sql = `select uuid,routerName,rootId,parentId,icon,routerFnId,routerSrc,pageSrc from AdminUserRouter where FIND_IN_SET(uuid, AdminUserRouter_GetChildNodesRecursion('${uuid}'))`;
+    return await this.app.mysql.query(sql);
+  }
+    // 根据批量uuid查询路由信息
+  async selRouterInfoByUuids(uuid) {
+    let sql = `select uuid,routerName,rootId,parentId,icon,routerFnId,routerSrc,pageSrc from AdminUserRouter where uuid in (${uuid})`;
+    return await this.app.mysql.query(sql);
   }
     // 根据uuid删除路由信息
   async delRouterByUuid(uuid){
@@ -44,7 +54,6 @@ class role extends Service {
     } catch (err) {
         await conn.rollback();
         throw err;
-        return null;
     }
   }
 }
