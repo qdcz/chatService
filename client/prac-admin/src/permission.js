@@ -1,12 +1,10 @@
-import router from './router'
+import {router,constantRoutes} from './router'
 import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
-/* Layout */
-import Layout from '@/layout';
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
@@ -20,14 +18,14 @@ router.beforeEach(async(to, from, next) => {
 
   // determine whether the user has logged in
   const hasToken = getToken()
-  console.log("token数据",hasToken)
+  // console.log("token数据",hasToken)
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done()
     } else {
-      console.log("stage的数据",store.getters)
+      // console.log("stage的数据",store.getters)
       const hasGetUserInfo = store.getters.name;
       const hasGetRouterInfo = store.getters.routerTreeData;
       if (hasGetUserInfo) {
@@ -52,8 +50,8 @@ router.beforeEach(async(to, from, next) => {
           }
           recur(routerTreeData)
           router.addRoutes(routerTreeData.slice(0,-1))
-          router.options.routes = router.options.routes.concat(routerTreeData.slice(0,-1))
-          
+          router.options.routes = constantRoutes.concat(routerTreeData.slice(0,-1))
+
           // 页面手动刷新触发
           if(from.name===null){
             // 解决刷新动态路由页面的404问题

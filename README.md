@@ -40,7 +40,8 @@ git clone https://github.com/qdcz/chatService.git
 # 进入databaseFile文件夹内
 cd /databaseFile
 
-# autherManager.sql 是包含建表结构和数据的sql文件
+# autherManager.sql 是仅包含建表结构sql文件
+# yrh_chart.sql 	是包含建表结构和数据的sql文件
 # 使用navicat或其它数据库管理工具将sql文件导入并运行
 ```
 

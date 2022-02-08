@@ -26,7 +26,7 @@ CREATE TABLE AdminUserRole (
     id bigint(0) NOT NULL AUTO_INCREMENT COMMENT '角色id 主键',
     uuid varchar(255) NOT NULL COMMENT '业务id',
     roleName varchar(50) COMMENT '角色名字',
-    routerId varchar(255) COMMENT '路由id',
+    routerId longtext(0) COMMENT '路由id',
     roleMark varchar(255) COMMENT '角色描述',
     PRIMARY KEY (id)
 ) COMMENT='用户角色表';
@@ -34,11 +34,13 @@ CREATE TABLE AdminUserRole (
 CREATE TABLE AdminUserRouter (
     id bigint(0) NOT NULL AUTO_INCREMENT COMMENT '路由id 主键',
     uuid varchar(255) NOT NULL COMMENT '业务id',
-    name varchar(50) COMMENT '路由名字',
-    rootid varchar(50) COMMENT '根级id',
-    parentid varchar(50) COMMENT '父级id',
+    routerName varchar(50) COMMENT '路由名字',
+    rootId varchar(50) COMMENT '根级id',
+    parentId varchar(50) COMMENT '父级id',
     icon varchar(50) COMMENT '路由图标',
-    routerFnid varchar(255) COMMENT '功能id',
+    routerFnId varchar(255) COMMENT '功能id',
+    routerSrc varchar(255) COMMENT '路由路径',
+    pageSrc varchar(255) COMMENT '页面路径',
     PRIMARY KEY (id)
 ) COMMENT='用户路由表';
 
@@ -48,3 +50,19 @@ CREATE TABLE AdminUserRouterFunction (
     name varchar(50) COMMENT '功能名字',
     PRIMARY KEY (id)
 ) COMMENT='用户路由下功能表';
+
+set global log_bin_trust_function_creators=TRUE;
+
+CREATE FUNCTION `AdminUserRouter_GetChildNodesRecursion`(rootId varchar(100))
+RETURNS varchar(2000)  
+BEGIN   
+DECLARE str varchar(2000);  
+DECLARE cid varchar(100);   
+SET str = '$';   
+SET cid = rootId;   
+WHILE cid is not null DO   
+    SET str = concat(str, ',', cid);   
+    SELECT group_concat(uuid) INTO cid FROM AdminUserRouter where FIND_IN_SET(parentId,cid);   
+END WHILE;   
+RETURN str;   
+END
