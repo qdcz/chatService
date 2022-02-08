@@ -39,8 +39,10 @@ router.beforeEach(async(to, from, next) => {
           let recur = function(list){
             list.forEach(i=>{
               i.component = resolve => {
-                if(!i.pageSrc){
+                if(!i.pageSrc && !i.rootId && !i.parentId){
                   require([`./layout/index.vue`], resolve)
+                }else if(!i.pageSrc){
+                  require([`./views/404.vue`], resolve)
                 }else{
                   require([i.pageSrc+'.vue'], resolve)
                 }
@@ -49,8 +51,8 @@ router.beforeEach(async(to, from, next) => {
             })
           }
           recur(routerTreeData)
-          router.addRoutes(routerTreeData.slice(0,-1))
-          router.options.routes = constantRoutes.concat(routerTreeData.slice(0,-1))
+          router.addRoutes(routerTreeData)
+          router.options.routes = constantRoutes.concat(routerTreeData)
 
           // 页面手动刷新触发
           if(from.name===null){

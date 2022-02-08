@@ -1,16 +1,17 @@
-const {codeMap} = require("../../config/staticConfig")
+const {codeMap} = require("../../config/staticConfig");
+const create_token = function(leng){
+    leng = leng==undefined?32:leng	//默认32位
+    let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz23456789'
+    let token = ''
+    for(let i=0;i<leng;++i) token+=chars.charAt(Math.floor(Math.random()*chars.length))
+    return token
+}
 module.exports = {
     codeMap:function (code) {
         console.log(code,codeMap[code])
         return JSON.parse(JSON.stringify({msg:codeMap[code],code}))
     },
-    create_token(leng){
-        leng = leng==undefined?32:leng	//默认32位
-        let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz23456789'
-        let token = ''
-        for(let i=0;i<leng;++i) token+=chars.charAt(Math.floor(Math.random()*chars.length))
-        return token
-    },
+    create_token:create_token,
     // 字符串加单引号  "55,66,77"  =  "'55','66','77'"
     addQuotationMarksForString(str){
         let newStr = "";
@@ -32,8 +33,8 @@ module.exports = {
             i.children = [];
 
             // 字段添加
-            i.path = i.routerSrc;
-            i.name = i.routerSrc;
+            i.path = i.routerSrc || create_token(10);
+            i.name = i.routerSrc || create_token(10);
             i.meta = {
                 title:i.routerName,
                 icon:i.icon
@@ -76,8 +77,8 @@ module.exports = {
 
 
                                     // 字段添加
-                                    path:_item.routerSrc,
-                                    name:_item.routerSrc,
+                                    path:_item.routerSrc || create_token(10),
+                                    name:_item.routerSrc || create_token(10),
                                     meta:{
                                         title:_item.routerName,
                                         icon:_item.icon
